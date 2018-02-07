@@ -32,7 +32,7 @@ class NormalLoginForm extends React.Component {
           </FormItem>
 
           <FormItem>
-            {getFieldDecorator('password', {
+            {getFieldDecorator('confirePwd', {
               rules: [{ required: true, message: '请再次输入密码！' }],
             })(
               <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="请再次输入密码！" />

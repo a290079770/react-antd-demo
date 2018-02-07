@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import {hashHistory} from 'react-router';
 
+import axios from 'axios';
+import baseURL from '../config.js';
+axios.defaults.baseURL = baseURL;
+axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
+
 const FormItem = Form.Item;
 
 class NormalLoginForm extends React.Component {
@@ -9,7 +14,9 @@ class NormalLoginForm extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
+         axios.post('/users/login',values).then(res=>{
+            console.log(res);
+         })
       }
     });
   }
