@@ -1,0 +1,8 @@
+th span{
+	text-align: center;
+	margin: 0 auto;
+}
+td{text-align: left;}
+th,td{
+	width: 150px;
+}

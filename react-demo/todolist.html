@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head> 
+    <meta charset="utf-8">
+	<title></title>
+	<style type="text/css">
+		.selected{
+			text-decoration: line-through;
+		}
+		li{
+			cursor: pointer;
+		}
+		i{
+			font-style: normal;
+		}
+	</style>
+</head>
+<body>
+   <input type="text" name=""><button id="addBtn">添加</button>
+   <div id="ulContent"></div>
+
+
+
+<script type="text/javascript" src='javascripts/jquery-1.7.min.js'></script> 
+<script type="text/javascript">
+
+	var data = {
+       todolist : [{_id:0,
+         text:'HTML',
+         completed:false},
+        {_id:1,
+         text:'CSS',
+         completed:true},
+        {_id:2,
+         text:'javascript',
+         completed:false}],
+        showType:'all',
+        index:3    
+    }
+     
+    $('#ulContent').on('click','li',function(){
+    	var index = $(this).index()
+    	for(var i = 0;i<data.todolist.length;i++){
+            if(data.todolist[i]._id==index){
+            	if(data.todolist[i].completed == false){
+            		data.todolist[i].completed = true
+            	}else{
+            		data.todolist[i].completed = false
+            	}
+            }
+    	}
+    	render(data)
+    }).on('click','a',function(e){
+     	e.preventDefault();
+    	data.showType = $(this).text();
+    	render(data)
+    }) 
+
+    $('#addBtn').on('click',function(){
+         data.todolist.push({
+         	_id:data.index,
+         	text:$('input').val(),
+         	completed:false
+         })
+         $('input').val('')
+         data.index++
+         render(data)
+    }) 
+
+     function showType(data){
+        switch(data.showType){
+          case 'all':return data.todolist;
+          case 'completed':
+                return data.todolist.filter(function(item){
+                   return item.completed
+                });
+          case 'active':return data.todolist.filter(function(item){
+                   return !item.completed
+                });
+        }
+     }
+    
+
+     render(data)  
+	 function render(data){
+        var str = '<ul>'
+        showType(data).map(function(item){
+         return str += '<li class="'+(item.completed?"selected":"")+'">'+item.text+'</li>'	
+        }).join('');
+        str += '</ul>';
+        str+='SHOW:'+ filter('all',data.showType)+filter('completed',data.showType)+filter('active',data.showType)
+
+        $('#ulContent').html(str)
+	 }
+ 
+    
+	 function filter(name,showType){
+       if(name == showType){
+         return '<span>'+name+'</span>&nbsp'
+       }else{
+         return '<a href="#">'+name+'</a>&nbsp'
+       }
+	 }
+
+</script>  
+</body>
+</html>

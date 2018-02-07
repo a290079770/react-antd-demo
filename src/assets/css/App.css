@@ -1,0 +1,11 @@
+/*引入ant-design组件样式*/
+@import '~antd/dist/antd.css';
+
+/*引入normalize*/
+@import './normalize.css';
+
+/*引入wrap*/
+@import './wrap.css';
+
+/*引入登录注册框样式*/
+@import './log-reg.css';

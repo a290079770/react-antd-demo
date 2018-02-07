@@ -1,0 +1,22 @@
+#lunbo{
+	width: 589px;
+	height: 363px;
+}
+#btns {
+	margin-left: 100px
+}
+#btns li{
+	width:30px;
+	height:30px;
+	list-style: none;
+	float: left;
+	opacity: 0.7;
+	border-radius: 50%;
+	margin-right: 20px
+}
+.reselected{
+   background: lightgreen;
+}
+.selected{
+	background: red;
+}

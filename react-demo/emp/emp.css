@@ -1,0 +1,11 @@
+td,th{
+	border:1px solid #666666
+}
+
+.show{
+	display: block;
+}
+
+.hide{
+	display:none;
+}
