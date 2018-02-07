@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script type="text/javascript" src="javascripts/jquery-1.7.min.js"></script>
+</head>
+<body>
+	<button id="test">测试nodeJs接口</button>
+	<script>
+		document.querySelector('#test').onclick = function() {
+			let data = {
+				username:'15181617073',
+				password:123456
+			}
+
+			$.ajax({
+			   type: "POST",
+			   url: "http://localhost:3001/users/reg",
+			   data: data,
+			   success: function(msg){
+			     console.log(msg);
+			   }
+			});
+			// fetch(new Request('/teacher/list',data)).then(res=>{
+	  //          if(res.ok) {
+   //               res.text().then(text=>{
+   //               	console.log(text);
+   //               })
+	  //          }else {
+	  //          	  console.log(res);
+	  //          }
+	  //       })
+		}
+	</script>
+</body>
+</html>
