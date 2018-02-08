@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var teacher = require('./routes/teachers');
+var book= require('./routes/book');
 
 var app = express();
 
@@ -37,11 +37,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 //引入数据库相关文件
 require('./dao/database.js');
 require('./dao/model/usersModel.js');
-require('./dao/model/teacherModel.js');
+require('./dao/model/bookModel.js');
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/teacher', teacher);
+app.use('/book', book);
 
 
 // catch 404 and forward to error handler

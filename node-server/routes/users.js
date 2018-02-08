@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var userService = require('../service/user-service.js');
+var response = require('../public/javascripts/plug.js').response; 
 
 /* GET users listing. */
 //登录接口
@@ -8,15 +9,15 @@ router.post('/login', function(req, res, next) {
   let data = req.body;
 
   if(!validAccount(data).valid) {
-  	 res.send(response(false,'',validAccount(data).msg));
+  	 return res.send(response(false,'',validAccount(data).msg));
   }
 
   //发起登录验证
   userService.login(data,resData=>{
-  	 if(!resData) {
-        res.send(response(false,'','该帐号还未注册！'));
+  	 if(!resData.success) {
+        return res.send(response(false,'',resData.msg));
   	 }else{
-  	 	res.send(response(true,resData));
+  	   	return res.send(response(true,resData.data[0]));
   	 }
   })
 
@@ -28,15 +29,15 @@ router.post('/reg', function(req, res, next) {
   let data = req.body;
 
   if(!validAccount(data).valid) {
-  	 res.send(response(false,'',validAccount(data).msg));
+  	 return res.send(response(false,'',validAccount(data).msg));
   }
 
   //发起登录验证
   userService.reg(data,resData=>{
   	 if(!resData.success) {
-        res.send(response(false,'',resData.msg));
+        return res.send(response(false,'',resData.msg));
   	 }else{
-  	 	res.send(response(true,resData.data));
+  	   	return res.send(response(true,resData.data));
   	 }
   })
 
@@ -68,24 +69,6 @@ function validAccount(data) {
 
 
 
-//设置响应信息
-function response(status,data,err,errorCode = 12) {
-	// errorCode - 根据具体业务确认
-    if(status) {
-    	//如果请求成功，则组织成功的数据
-    	return {
-    		Success:true,
-    		Data:data,
-    		Description:'ok',
-    		Code:200
-    	}
-    }else {
-    	return {
-    		Success:false,
-    		Description:err,
-    		Code:errorCode,
-    	}
-    }
-}
+
 
 module.exports = router;

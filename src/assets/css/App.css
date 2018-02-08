@@ -9,3 +9,6 @@
 
 /*引入登录注册框样式*/
 @import './log-reg.css';
+
+/*引入管理后台样式*/
+@import './admin.css';

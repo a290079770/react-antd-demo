@@ -4,14 +4,10 @@ var userDao = require('../dao/user-dao.js');
 //登录
 module.exports.login = function(data,callback) {
  userDao.login(data,res=>{
- 	    if(res.length == 0) {
-            callback(false);
- 	    }else {
- 	    	delete res[0].password;
-		    callback(res[0]);
- 	    }
- 	 //如果登录成功，需要屏蔽掉密码这个敏感信息
-  })
+ 	    if(res.success) delete res.data[0].password;
+ 	    //如果登录成功，需要屏蔽掉密码这个敏感信息
+ 	    callback(res);
+   })
 }
 
 
@@ -24,7 +20,6 @@ module.exports.reg = function(data,callback) {
  	   }else {
          callback(res);
  	   }
- 	 //如果登录成功，需要屏蔽掉密码这个敏感信息
   })
 }
 

@@ -3,14 +3,38 @@ var mongoose = require('mongoose');
 //登录
 module.exports.login = function(data,callback) {
 	var usersModel = mongoose.model('users');
-    usersModel.find(data,(err,data)=>{
+    usersModel.find({username:data.username},(err,fdata)=>{
     	if(err) {
-           console.log(err);
+           callback({
+             success:false,
+             msg:err
+           })
     	}else {
-    	   callback(data);
+    	   if(fdata.length === 0) {
+              callback({
+                success:false,
+                msg:'该账号还未注册！'
+              })
+           }else {
+              let arr = [];
+              fdata.forEach((item,index)=>{
+                if(item.password == data.password) arr.push(item);
+              })
+
+              if(arr.length === 0) {
+                  callback({
+                    success:false,
+                    msg:'账号或密码错误！'
+                  })
+               }else {
+                  callback({
+                    success:true,
+                    data:arr
+                  });
+               }
+           }
     	}
     })
-
 }
 
 

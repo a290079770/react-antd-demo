@@ -1,3 +1,6 @@
-const baseUrl = 'http://localhost:3001';
+import axios from 'axios';
 
-export default baseUrl;
+axios.defaults.baseURL = 'http://localhost:3001';
+axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
+
+export default axios;
