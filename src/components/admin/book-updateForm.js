@@ -3,23 +3,44 @@ import axios from '../../config.js';
 
 import { Modal,Form, Icon, Input, Button,message,DatePicker} from 'antd';
 
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
+
 const FormItem = Form.Item;
 
-class BookAddForm extends React.Component {
+class BookUpdateForm extends React.Component {
   constructor(props) {
      super(props);
      this.state = {
-
+       curId:'',
+       text:'2222'
      };
+  }
+
+  
+  //获取图书详情
+  getBookDetail(id) {
+    let _this = this;
+    axios.get('/book/detail',{
+      params:{id:id}
+    }).then(res=>{
+        console.log(res.data)
+        if(res.data.Success) {
+           _this.props.form.setFields(res.data.Data);
+        }else {
+           message.error(res.data.Description);
+        }
+     })
   }
 
   handleSubmit = () => {
     this.props.form.validateFields((err, values) => {
       if (!err) {
-         axios.post('/book/create',values).then(res=>{
+         axios.post('/book/update',Object.assign({id:this.props.updateData._id},values)).then(res=>{
             console.log(res.data)
             if(res.data.Success) {
-               message.success('添加图书成功！');
+               message.success('修改图书成功！');
                this.props.form.resetFields();
                this.props.hideModal(true);
             }else {
@@ -47,12 +68,13 @@ class BookAddForm extends React.Component {
     const right = 12;
     return (
       <Modal
-          title="新增图书"
+          title="修改图书"
           style={{ top:200 }}
-          visible={this.props.isAddModalShow}
+          visible={this.props.isUpdateModalShow}
           cancelText="取消"
-          okText="新增"
+          okText="修改"
           closable={false}
+          destroyOnClose={true}
           onOk={() => this.setModalVisible(false,true)}
           onCancel={() => this.setModalVisible(false)}
         >
@@ -66,7 +88,7 @@ class BookAddForm extends React.Component {
                 {getFieldDecorator('title', {
                   rules: [{ required: true, message: '请输入书名！' }],
                 })(
-                  <Input placeholder="请输入书名！" />
+                  <Input placeholder="请输入书名！"/>
                 )}
               </FormItem>
               <FormItem
@@ -113,4 +135,24 @@ class BookAddForm extends React.Component {
   }
 }
 
-export default Form.create()(BookAddForm);
+//表单赋初始值
+
+export default Form.create({
+  mapPropsToFields(props) {
+    if(!props.updateData) return {}
+    return {
+      title: Form.createFormField({
+         value:props.updateData.title
+      }),
+      author: Form.createFormField({
+         value:props.updateData.author
+      }),
+      publisher: Form.createFormField({
+         value:props.updateData.publisher
+      }),
+      publishDate: Form.createFormField({
+         value:moment(props.updateData.publishDate,'YYYY-MM-DD')
+      })
+    }
+  },
+})(BookUpdateForm);

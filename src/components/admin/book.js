@@ -1,7 +1,10 @@
 import React from 'react';
-import { Table, Button,message } from 'antd';
+import { Table, Button,message,Input,Modal } from 'antd';
 import BookAddForm from './book-addForm';
+import BookUpdateForm from './book-updateForm';
 import axios from '../../config.js';
+const Search = Input.Search;
+const confirm = Modal.confirm
 
 export default class Book extends React.Component {
   state = {
@@ -10,11 +13,15 @@ export default class Book extends React.Component {
     dataList:[],
     ps:10,
     cp:1,
+    total:0,
     keyword:'',
     isAddModalShow:false,
+    updateData:null,
     columns:[{
       title: '书名',
       dataIndex: 'title',
+      width:200,
+
     }, {
       title: '作者',
       dataIndex: 'author',
@@ -25,11 +32,13 @@ export default class Book extends React.Component {
       title: '出版时间',
       dataIndex: 'publishDate',
     },{
+      title: '操作',
+      align:'center',
       render:text=>{
         return (
            <span>
-              <Button type="primary" size='small' icon="edit" style={{marginRight:'5px'}}>修改</Button>
-              <Button type="danger" icon="delete" size='small'>删除</Button>
+              <Button type="primary" size='small' icon="edit" style={{marginRight:'5px'}} onClick={()=>this.update(text)}>修改</Button>
+              <Button type="danger" icon="delete" size='small' onClick={()=>this.delete(text)}>删除</Button>
            </span>
           ) 
         }
@@ -44,15 +53,7 @@ export default class Book extends React.Component {
    * @return   {[type]}   [description]
    */
   componentWillMount() {
-    for (let i = 0; i < 46; i++) {
-      this.state.dataList.push({
-        key: i,
-        title: `Edward King ${i}`,
-        author: 32,
-        publisher: `London, Park Lane no. ${i}`,
-        publishDate: `London, Park Lane no. ${i}`,
-      });
-    }
+    this.getTableList();
   }
   
   /**
@@ -69,9 +70,17 @@ export default class Book extends React.Component {
           keyword:this.state.keyword,
        }
      }).then(res=>{
-        console.log(res.data)
         if(res.data.Success) {
-           
+           res.data.Data.itemList = res.data.Data.itemList.map((item)=>{
+              return Object.assign({
+                 key:item._id
+              },item)
+           })
+
+           this.setState({
+             dataList:res.data.Data.itemList,
+             total:res.data.Data.totalRecord
+           })
         }else {
            message.error(res.data.Description);
         }
@@ -84,15 +93,71 @@ export default class Book extends React.Component {
   }
   
   //分页
-  onPaginationChange(page, pageSize) {
-    
+  onPaginationChange = (page, pageSize) => {
+     this.setState({
+        ps:pageSize,
+        cp:page,
+     },()=>{
+        this.getTableList();
+     })
+  }
+
+  //设置搜索列表
+  searchList(keyword) {
+     this.setState({
+        keyword:keyword,
+        ps:10,
+        cp:1
+     },()=>{
+        this.getTableList();
+     })
+  }
+
+  //删除操作
+  delete(item) {
+     let _this = this;
+     confirm({
+      title: '警告',
+      content: '确定删除这本书？',
+      okText:'确定',
+      style:{top:250},
+      cancelText:'取消',
+      onOk() {
+       axios.post('/book/delete',{
+         id:item._id,
+       }).then(res=>{
+          if(res.data.Success) {
+             message.success('删除成功！');
+             _this.getTableList();
+          }else {
+             message.error(res.data.Description);
+          }
+       })
+     }  
+    }) 
+  }
+
+
+  //删除操作
+  update(item) {
+     this.state.updateData = item;
+     this.toggleModal(true,false,'isUpdateModalShow');
   }
 
   //关闭模态框
-  toggleModal(visible) {
-    this.setState({ 
-      isAddModalShow:visible
-    });
+  toggleModal(visible,needReload,modalName='isAddModalShow') {
+    let obj = {};
+    if(modalName == 'isAddModalShow') {
+      obj = {isAddModalShow:visible}
+    }else if(modalName == 'isUpdateModalShow'){
+      obj = {isUpdateModalShow:visible}
+    }
+
+    this.setState(obj);
+
+    if(needReload) {
+      this.getTableList();
+    }
   }
 
 
@@ -104,7 +169,12 @@ export default class Book extends React.Component {
     };
     const hasSelected = selectedRowKeys.length > 0;
     const pagination = {
-       onChange:this.onPaginationChange
+       onChange:this.onPaginationChange,
+       current:this.state.cp,
+       defaultCurrent:1,
+       defaultPageSize:10,
+       pageSize:this.state.ps,
+       total:this.state.total
     }
     return (
       <div>
@@ -116,10 +186,23 @@ export default class Book extends React.Component {
           >
             新增
           </Button>
+
+          <Search
+            placeholder="请输入图书名和作者关键字进行查询"
+            onSearch={value => this.searchList(value)}
+            style={{ width: 200,float:'right' }}
+          />
         </div>
         <Table pagination={pagination} rowSelection={rowSelection} columns={this.state.columns} dataSource={ this.state.dataList} />
 
-        <BookAddForm isAddModalShow={this.state.isAddModalShow} hideModal={()=>this.toggleModal(false)}/>
+        <BookAddForm 
+          isAddModalShow={this.state.isAddModalShow} 
+          hideModal={(needReload)=>this.toggleModal(false,needReload)}/>
+
+        <BookUpdateForm 
+          updateData={this.state.updateData}
+          isUpdateModalShow={this.state.isUpdateModalShow} 
+          hideModal={(needReload)=>this.toggleModal(false,needReload,'isUpdateModalShow')}/>  
 
       </div>
     );

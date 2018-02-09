@@ -4,13 +4,35 @@ var bookService = require('../service/book-service.js');
 var response = require('../public/javascripts/plug.js').response; 
 
 /* GET users listing. */
+//图书列表
 router.get('/list', function(req, res, next) {
-	//获取get请求参数
-	console.log(req.query);
-  // res.send('from teachers');
+	//获取get请求参数，赋默认值
+	let data = {
+		ps:req.query.ps ? req.query.ps : 10,
+		cp:req.query.cp ? req.query.cp : 1,
+		keyword:req.query.keyword ? req.query.keyword : '',
+	}
+    bookService.list(data,resData=>{
+		return res.send(response(true,resData));
+	})
 });
 
+//图书详情
+router.get('/detail', function(req, res, next) {
+	//获取get请求参数，赋默认值
+	if(!req.query.id) {
+  	  return res.send(response(false,'','图书编号不能为空！'));
+    }
+    bookService.detail(req.query.id,resData=>{
+    	if(resData.success) {
+    		return res.send(response(true,resData.data));
+    	}else {
+    		return res.send(response(false,'',resData.msg));
+    	}
+	})
+});
 
+//新增图书
 router.post('/create', function(req, res, next) {
 	//获取post请求参数
     if(!validBookData(req.body).valid) {
@@ -22,7 +44,34 @@ router.post('/create', function(req, res, next) {
 	})
 });
 
+//删除图书
+router.post('/delete', function(req, res, next) {
+	//获取post请求参数
+    if(!req.body.id) {
+  	  return res.send(response(false,'','图书编号不能为空！'));
+    }
 
+	bookService.delete(req.body.id,resData=>{
+		return res.send(response(true,resData));
+	})
+});
+
+
+//修改图书
+router.post('/update', function(req, res, next) {
+	//获取post请求参数
+    if(!req.body.id) {
+  	  return res.send(response(false,'','图书编号不能为空！'));
+    }
+
+	bookService.update(req.body,resData=>{
+		if(resData.success) {
+    		return res.send(response(true,'ok'));
+    	}else {
+    		return res.send(response(false,'',resData.msg));
+    	}
+	})
+});
 
 
 function validBookData(data) {

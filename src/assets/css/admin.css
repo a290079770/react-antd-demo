@@ -35,6 +35,10 @@
 	background: black;
 }
 
+.ant-layout-content {
+  min-height: initial !important;
+}
+
 .admin td {
 	padding: 12px 16px !important;
 }
